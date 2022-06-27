@@ -1,0 +1,4 @@
+<plugin>
+    <name>local</name>
+    <classname>scala.scalanative.localplugin.LocalPlugin</classname>
+</plugin>

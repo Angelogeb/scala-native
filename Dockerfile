@@ -1,0 +1,28 @@
+FROM ubuntu:18.04
+
+# java
+RUN apt-get update && apt-get install -y openjdk-11-jdk
+
+# sbt
+RUN apt-get update && apt-get install apt-transport-https build-essential curl wget gnupg xz-utils -yqq && \
+    echo "deb https://repo.scala-sbt.org/scalasbt/debian all main" | tee /etc/apt/sources.list.d/sbt.list && \
+    echo "deb https://repo.scala-sbt.org/scalasbt/debian /" | tee /etc/apt/sources.list.d/sbt_old.list && \
+    curl -sL "https://keyserver.ubuntu.com/pks/lookup?op=get&search=0x2EE0EA64E40A89B84B2DF73499E82A75642AC823" | \
+    gpg --no-default-keyring --keyring gnupg-ring:/etc/apt/trusted.gpg.d/scalasbt-release.gpg --import &&\
+    chmod 644 /etc/apt/trusted.gpg.d/scalasbt-release.gpg && apt-get update && apt-get -y install sbt
+
+WORKDIR /tmp
+
+# llvm for backend
+RUN apt install -y clang-10 && update-alternatives --install /usr/bin/clang clang /usr/bin/clang-10 100 && update-alternatives --install /usr/bin/clang++ clang++ /usr/bin/clang++-10 100
+
+# python3.8 etc. for benchmarks
+RUN apt-get install -yqq python3.8 python3.8-dev python3.8-distutils python3.8-venv && \
+    curl https://bootstrap.pypa.io/get-pip.py -o get-pip.py && python3.8 get-pip.py && \
+    pip install pandas matplotlib
+
+
+RUN useradd -ms /bin/bash ecoop
+
+USER ecoop
+WORKDIR /home/ecoop
